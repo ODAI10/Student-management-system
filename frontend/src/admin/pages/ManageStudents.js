@@ -10,7 +10,7 @@ import {
   Modal,
 } from "react-bootstrap";
 import axios from "axios";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 function ManageStudents() {
   const [students, setStudents] = useState([]);
@@ -18,27 +18,37 @@ function ManageStudents() {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false); // لإظهار نموذج إضافة طالب جديد
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   const [newStudent, setNewStudent] = useState({
     full_name: "",
     email: "",
     phone: "",
     address: "",
     status: "نشط",
-    password: "", // إضافة كلمة السر
+    password: "",
   });
-  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  // رسائل الإضافة
+  const [addMessage, setAddMessage] = useState("");
+  const [addMessageType, setAddMessageType] = useState("");
+
+  // رسائل التعديل
+  const [updateMessage, setUpdateMessage] = useState("");
+  const [updateMessageType, setUpdateMessageType] = useState("");
 
   useEffect(() => {
     fetchStudents();
   }, []);
 
   const fetchStudents = () => {
-    axios.get("http://localhost:5000/api/admin/students", {
-      headers: {
-        Authorization: `Bearer ${Cookies.get("jwt_token")}`,
-      },
-    })
+    axios
+      .get("http://localhost:5000/api/admin/students", {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("jwt_token")}`,
+        },
+      })
       .then((response) => {
         setStudents(response.data);
         setLoading(false);
@@ -51,15 +61,18 @@ function ManageStudents() {
 
   const handleEditClick = (student) => {
     setSelectedStudent(student);
+    setUpdateMessage("");
+    setUpdateMessageType("");
     setShowModal(true);
   };
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:5000/api/admin/student/${selectedStudent.id}`, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get("jwt_token")}`,
-      },
-    })
+    axios
+      .delete(`http://localhost:5000/api/admin/student/${selectedStudent.id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("jwt_token")}`,
+        },
+      })
       .then(() => {
         setShowConfirmation(true);
         setTimeout(() => {
@@ -80,11 +93,17 @@ function ManageStudents() {
         address: selectedStudent.address,
         status: selectedStudent.status === "نشط" ? "active" : "suspended",
       })
-      .then(() => {
-        setShowModal(false);
+      .then((res) => {
+        setUpdateMessage(res.data.message || "تم التحديث بنجاح");
+        setUpdateMessageType("success");
         fetchStudents();
       })
-      .catch((error) => console.error("Error updating student", error));
+      .catch((error) => {
+        const msg =
+          error.response?.data?.message || "حدث خطأ أثناء التحديث";
+        setUpdateMessage(msg);
+        setUpdateMessageType("error");
+      });
   };
 
   const handleAddStudent = () => {
@@ -95,31 +114,50 @@ function ManageStudents() {
         phone: newStudent.phone,
         address: newStudent.address,
         status: newStudent.status === "نشط" ? "active" : "suspended",
-        password: newStudent.password, // إضافة كلمة السر
+        password: newStudent.password,
       })
-      .then(() => {
-        setShowAddModal(false);
-        fetchStudents(); // إعادة تحميل الطلاب
+      .then((res) => {
+        setAddMessage(res.data.message || "تمت الإضافة بنجاح");
+        setAddMessageType("success");
+        fetchStudents();
+        setNewStudent({
+          full_name: "",
+          email: "",
+          phone: "",
+          address: "",
+          status: "نشط",
+          password: "",
+        });
       })
-      .catch((error) => console.error("Error adding student", error));
+      .catch((error) => {
+        const msg =
+          error.response?.data?.message || "حدث خطأ أثناء الإضافة";
+        setAddMessage(msg);
+        setAddMessageType("error");
+      });
   };
 
-  const filteredStudents = students.filter(
-    (student) =>
-      student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.phone.includes(searchTerm) ||
-      student.address.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStudents = students.filter((student) =>
+    [student.full_name, student.email, student.phone, student.address]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
   );
 
   return (
-    <Container className="mt-4" >
-      <Row className="justify-content-center" >
-        <Col md={10} >
-          <Card className="shadow-sm border-0" >
-            <Card.Header style={{ backgroundColor: "#2c3e50" }}  className=" text-white d-flex justify-content-between align-items-center p-3">
-           
-              <Button variant="success" onClick={() => setShowAddModal(true)}>
+    <Container className="mt-4">
+      <Row className="justify-content-center">
+        <Col md={10}>
+          <Card className="shadow-sm border-0">
+            <Card.Header
+              style={{ backgroundColor: "#2c3e50" }}
+              className="text-white d-flex justify-content-between align-items-center p-3"
+            >
+              <Button variant="success" onClick={() => {
+                setAddMessage("");
+                setAddMessageType("");
+                setShowAddModal(true);
+              }}>
                 + إضافة طالب
               </Button>
               <Form.Control
@@ -128,13 +166,9 @@ function ManageStudents() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-50"
-                
               />
-             
               <h5 className="fw-bold m-0">إدارة الطلاب</h5>
-
             </Card.Header>
-
             <Card.Body>
               {loading ? (
                 <div className="text-center my-4">
@@ -153,13 +187,16 @@ function ManageStudents() {
                       <Col md={2}>
                         <p className="mb-1">📞 {student.phone}</p>
                       </Col>
-                      <Col md={3}>
-                        <p className="mb-1">📍 {student.address}</p>
+                      <Col md={3} >
+                        <p className="mb-1">
+                          <i className="bi bi-geo-alt-fill text-success"></i>{" "}
+                          {student.address}
+                        </p>
                       </Col>
                       <Col md={1}>
                         <p
                           className={`badge bg-${
-                            student.status === "نشط" ? "success" : "danger"
+                            student.status === "نشط" ? "success" : "danger mb-1 py-2" 
                           }`}
                         >
                           {student.status}
@@ -185,12 +222,29 @@ function ManageStudents() {
         </Col>
       </Row>
 
-      {/* نموذج تعديل الطالب */}
+      {/* تعديل الطالب */}
       {selectedStudent && (
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
             <Modal.Title>تعديل بيانات الطالب</Modal.Title>
           </Modal.Header>
+          {updateMessage && (
+            <div className="d-flex justify-content-center my-3">
+              <div
+                className={`px-4 py-2 rounded  d-flex align-items-center gap-2 ${
+                  updateMessageType === "error" ? "text-danger" : "text-success"
+                }`}
+                style={{
+                  backgroundColor: "#fff",
+                  fontWeight: "500",
+                  fontSize: "16px",
+                }}
+              >
+                <span>{updateMessageType === "error" ? "❌" : "✅"}</span>
+                <span>{updateMessage}</span>
+              </div>
+            </div>
+          )}
           <Modal.Body>
             <Form>
               <Form.Group>
@@ -236,7 +290,7 @@ function ManageStudents() {
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>📍 العنوان</Form.Label>
+                <Form.Label>العنوان</Form.Label>
                 <Form.Control
                   type="text"
                   value={selectedStudent.address}
@@ -280,12 +334,29 @@ function ManageStudents() {
         </Modal>
       )}
 
-      {/* نموذج إضافة طالب جديد */}
+      {/* إضافة طالب */}
       {showAddModal && (
         <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
           <Modal.Header closeButton>
             <Modal.Title>إضافة طالب جديد</Modal.Title>
           </Modal.Header>
+          {addMessage && (
+            <div className="d-flex justify-content-center my-3">
+              <div
+                className={`px-4 py-2 rounded  d-flex align-items-center gap-2 ${
+                  addMessageType === "error" ? "text-danger" : "text-success"
+                }`}
+                style={{
+                  backgroundColor: "#fff",
+                  fontWeight: "500",
+                  fontSize: "16px",
+                }}
+              >
+                <span>{addMessageType === "error" ? "❌" : "✅"}</span>
+                <span>{addMessage}</span>
+              </div>
+            </div>
+          )}
           <Modal.Body>
             <Form>
               <Form.Group>
@@ -298,7 +369,6 @@ function ManageStudents() {
                   }
                 />
               </Form.Group>
-
               <Form.Group>
                 <Form.Label>البريد الإلكتروني</Form.Label>
                 <Form.Control
@@ -309,7 +379,6 @@ function ManageStudents() {
                   }
                 />
               </Form.Group>
-
               <Form.Group>
                 <Form.Label>رقم الهاتف</Form.Label>
                 <Form.Control
@@ -320,9 +389,8 @@ function ManageStudents() {
                   }
                 />
               </Form.Group>
-
               <Form.Group>
-                <Form.Label>📍 العنوان</Form.Label>
+                <Form.Label>العنوان</Form.Label>
                 <Form.Control
                   type="text"
                   value={newStudent.address}
@@ -331,7 +399,6 @@ function ManageStudents() {
                   }
                 />
               </Form.Group>
-
               <Form.Group>
                 <Form.Label>الحالة</Form.Label>
                 <Form.Select
@@ -344,7 +411,6 @@ function ManageStudents() {
                   <option value="غير نشط">غير نشط</option>
                 </Form.Select>
               </Form.Group>
-
               <Form.Group>
                 <Form.Label>كلمة السر</Form.Label>
                 <Form.Control
@@ -366,13 +432,6 @@ function ManageStudents() {
             </Button>
           </Modal.Footer>
         </Modal>
-      )}
-
-      {/* رسالة تأكيد الحذف */}
-      {showConfirmation && (
-        <div className="alert alert-success mt-3 text-center">
-          تم حذف الطالب بنجاح!
-        </div>
       )}
     </Container>
   );

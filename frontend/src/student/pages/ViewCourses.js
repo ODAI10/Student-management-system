@@ -51,15 +51,15 @@ function ViewStudentCourses() {
                 </div>
               ) : courses.length > 0 ? (
                 courses.map((course) => (
-                  <Card key={course.id} className="mb-3 p-3 shadow-sm border-0">
+                  <Card key={course.id} className="mb-3 p-3 px-3 shadow-sm border-0">
                     <Row className="align-items-center">
-                      <Col md={3}>
+                      <Col md={5}>
                         <h6 className="fw-bold">{course.name}</h6>
                       </Col>
-                      <Col md={3}>
+                      <Col md={4}>
                         <p className="mb-1">{course.department}</p>
                       </Col>
-                      <Col md={2}>
+                      <Col md={3}>
                         <p className="mb-1">{course.credits} ساعات</p>
                       </Col>
                     </Row>

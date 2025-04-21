@@ -53,44 +53,44 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh' }}>
-      {/* الشريط الجانبي */}
+    <div className="d-flex" style={{ minHeight: '100vh', flexDirection: 'row-reverse' }}>
+      {/* الشريط الجانبي على اليمين */}
       <div className="bg-sidebar text-white p-3" style={{ width: '250px' }}>
         <h3 className="text-center mb-4">لوحة التحكم</h3>
         <Nav className="flex-column">
           <Nav.Link
             onClick={() => setActiveComponent('profile')}
-            className={`text-white sidebar-link ${activeComponent === 'profile' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'profile' ? 'active' : ''}`} dir="rtl"
           >
             معلومات الأدمن
           </Nav.Link>
           <Nav.Link
             onClick={() => setActiveComponent('students')}
-            className={`text-white sidebar-link ${activeComponent === 'students' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'students' ? 'active' : ''}`}dir="rtl"
           >
             إدارة الطلاب
           </Nav.Link>
           <Nav.Link
             onClick={() => setActiveComponent('courses')}
-            className={`text-white sidebar-link ${activeComponent === 'courses' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'courses' ? 'active' : ''}`}dir="rtl"
           >
             إدارة المواد
           </Nav.Link>
           <Nav.Link
             onClick={() => setActiveComponent('grades')}
-            className={`text-white sidebar-link ${activeComponent === 'grades' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'grades' ? 'active' : ''}`}dir="rtl"
           >
             إدارة العلامات
           </Nav.Link>
           <Nav.Link
             onClick={() => setActiveComponent('student-courses')}
-            className={`text-white sidebar-link ${activeComponent === 'student-courses' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'student-courses' ? 'active' : ''}`}dir="rtl"
           >
             إضافة مواد للطالب
           </Nav.Link>
           <Nav.Link
             onClick={() => setActiveComponent('add-admin')}
-            className={`text-white sidebar-link ${activeComponent === 'add-admin' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'add-admin' ? 'active' : ''}`}dir="rtl"
           >
             إضافة أدمن
           </Nav.Link>
@@ -99,7 +99,7 @@ function AdminDashboard() {
         </Nav>
       </div>
 
-      {/* محتوى الصفحة */}
+      {/* محتوى الصفحة على اليسار */}
       <div className="flex-grow-1 p-4" style={{ backgroundColor: '#f8f9fa' }}>
         {renderComponent()}
       </div>

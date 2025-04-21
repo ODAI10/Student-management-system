@@ -8,7 +8,8 @@ function AdminProfile() {
   const [userInfo, setUserInfo] = useState(null);
   const [updatedInfo, setUpdatedInfo] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); 
   useEffect(() => {
     axios
     .get("http://localhost:5000/api/admin/profile", {
@@ -35,19 +36,25 @@ function AdminProfile() {
 
   const handleSave = () => {
     axios
-    .put("http://localhost:5000/api/admin/profile", updatedInfo, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get("jwt_token")}`,
-      },
+      .put("http://localhost:5000/api/admin/profile", updatedInfo, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("jwt_token")}`,
+        },
       })
-      .then(() => {
+      .then((response) => {
         setUserInfo(updatedInfo);
         setIsEditing(false);
+        setMessage(response.data.message );
+        setMessageType("success");
       })
       .catch((error) => {
-        console.error("Error saving profile data", error);
+        const errMsg =
+          error.response?.data?.message || "حدث خطأ أثناء تحديث البيانات";
+        setMessage(errMsg);
+        setMessageType("error");
       });
   };
+  
 
   const backToProfilePage = () => {
     setIsEditing(false);
@@ -66,6 +73,23 @@ function AdminProfile() {
             <Card.Header className="text-white text-center" style={{ backgroundColor: "#2c3e50" }}>
               {isEditing ? "تعديل تفاصيل الحساب" : "تفاصيل الحساب"}
             </Card.Header>
+            {message && messageType === "error" && (
+  <div className="d-flex justify-content-center my-3">
+    <div
+      className="px-4 py-2 rounded  d-flex align-items-center gap-2 text-danger"
+      style={{
+        backgroundColor: "#fff",
+        fontWeight: "500",
+        fontSize: "16px",
+      }}
+    >
+      <span>❌</span>
+      <span>{message}</span>
+    </div>
+  </div>
+)}
+
+
 
             <Card.Body style={{  color: "white" }}>
               {isEditing ? (

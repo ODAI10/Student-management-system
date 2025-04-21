@@ -30,16 +30,31 @@ const authenticate = (req, res, next) => {
 const validateUserInput = async (req, res, next) => {
   const {full_name,email,address,  password, phone } = req.body;
 
-  if(!full_name || !email|| !address){
+  if(!full_name || !email|| !address || !phone){
     return res.status(400).json({message: "الرجاء ادخال جميع الخانات"})
   }
+
+  if (full_name.length < 3) {
+    return res.status(400).json({ message: "الاسم  يجب أن يكون 3 أحرف على الأقل" });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailRegex.test(email)) {
+  return res.status(400).json({ message: " البريد الإلكتروني غير صحيح" });
+}
+
   if (password && password.length < 8) {
     return res.status(400).json({ message: "يجب ان تكون كلمة المرور 8 خانات على الاقل" });
   }
 
-  if (phone && phone.length !== 10) {
-    return res.status(400).json({ message: "رقم الهاتف يجب ان يكون 10 ارقام " });
+  if (!/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ message: "رقم الهاتف يجب أن يتكون من 10 أرقام فقط" });
   }
+  
+  if (address.length < 3) {
+    return res.status(400).json({ message: "اسم المدينة يجب أن يكون 3 أحرف على الأقل" });
+  }
+  
 
   next();
 };

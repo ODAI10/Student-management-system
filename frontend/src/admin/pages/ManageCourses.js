@@ -97,7 +97,7 @@ function ManageCourses() {
         padding: '8px 15px'
       }}
     >
-      ➕ إضافة مادة
+       إضافة مادة
     </Button>
   </div>
   <Form.Control
@@ -225,9 +225,8 @@ function ManageCourses() {
                             </Col>
                             <Col md={4} className="d-flex gap-2">
                               <Button
-                                variant="info"
+                                className='btn btn-secondary'
                                 onClick={() => handleEditClick(course)}
-                                style={{ backgroundColor: "#3498db", borderColor: "#3498db" }}
                               >
                                 ✏️ تعديل
                               </Button>

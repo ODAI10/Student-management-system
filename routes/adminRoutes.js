@@ -37,7 +37,7 @@ router.put("/profile", authenticate, validateUserInput, (req, res) => {
           .status(500)
           .json({ message: "Error updating admin profile", error: err });
       }
-      res.json({ message: "Profile updated successfully" });
+      res.json({ message: "" });
     }
   );
 });
@@ -79,6 +79,7 @@ router.post("/add-admin", validateUserInput, (req, res) => {
             .status(500)
             .json({ message: "Error adding admin to database", error: err });
         }
+        console.log(err)
 
         const token = jwt.sign(
           { id: result.insertId },
@@ -115,12 +116,6 @@ router.delete("/profile/:id", (req, res) => {
 router.post("/add-student", validateUserInput, (req, res) => {
   const { full_name, email, phone, address, status, password } = req.body;
 
-  if (!full_name || !email || !phone || !address || !status || !password) {
-    return res
-      .status(400)
-      .json({ message: "Please provide all required fields" });
-  }
-
   // Hash the password
   bcryptjs.hash(password, 10, (err, hashedPassword) => {
     if (err) {
@@ -136,7 +131,7 @@ router.post("/add-student", validateUserInput, (req, res) => {
         if (err) {
           return res
             .status(500)
-            .json({ message: "Error adding student", error: err });
+            .json({ message: "خطا في اضافة الطالب", error: err });
         }
 
         // Create JWT token after inserting student
@@ -147,7 +142,7 @@ router.post("/add-student", validateUserInput, (req, res) => {
         );
 
         res.status(201).json({
-          message: "Student added successfully",
+          message: "تم اضافة الطالب بنجاح",
           studentId: result.insertId,
           token,
         });
@@ -182,10 +177,8 @@ router.put("/student/:id", validateUserInput, (req, res) => {
     [full_name, email, phone, address, status, studentId],
     (err, result) => {
       if (err)
-        return res
-          .status(500)
-          .json({ message: "Error updating student profile", error: err });
-      res.json({ message: "Profile updated successfully" });
+        return res.status(500).json({ message: "خطا في تحديث البيانات", error: err });
+       res.json({ message: "تم تحديث البيانات بنجاح" });
     }
   );
 });

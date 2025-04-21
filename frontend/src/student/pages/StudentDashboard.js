@@ -43,26 +43,26 @@ function StudentDashboard() {
   };
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh' }}>
+    <div className="d-flex" style={{ minHeight: '100vh' ,flexDirection: 'row-reverse'  }}>
       {/* الشريط الجانبي */}
       <div className="bg-sidebar text-white p-3" style={{ width: '250px' }}>
         <h4 className="text-center mb-4">لوحة التحكم للطالب</h4>
         <Nav className="flex-column">
           <Nav.Link
             onClick={() => setActiveComponent('profile')}
-            className={`text-white sidebar-link ${activeComponent === 'profile' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'profile' ? 'active' : ''}`}dir="rtl"
           >
             معلومات الطالب
           </Nav.Link>
           <Nav.Link
             onClick={() => setActiveComponent('courses')}
-            className={`text-white sidebar-link ${activeComponent === 'courses' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'courses' ? 'active' : ''}`}dir="rtl"
           >
             عرض المواد الدراسية
           </Nav.Link>
           <Nav.Link
             onClick={() => setActiveComponent('grades')}
-            className={`text-white sidebar-link ${activeComponent === 'grades' ? 'active' : ''}`}
+            className={`text-white sidebar-link ${activeComponent === 'grades' ? 'active' : ''}`}dir="rtl"
           >
             عرض العلامات
           </Nav.Link>
