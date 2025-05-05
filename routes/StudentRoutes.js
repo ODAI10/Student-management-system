@@ -2,33 +2,32 @@
 const express = require('express');
 const router = express.Router();
 const connection = require('../db');
-const bcryptjs = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
-const authenticate = require("../middleware/middleware");
+
 
 //get  Student profile
 router.get("/profile/:id",(req,res)=>{
     const studentId = req.params.id
-
+    if (!studentId) {
+        return res.status(400).json({ message: " غير موجود id"  });
+    }
     const query = "SELECT * FROM students WHERE id=?"
     connection.query(query,[studentId],(err,result)=>{
         if(err){
-            return res.status(400).json({Message:"Error show profile data"})
+            return res.status(400).json({ message: "حدث خطأ أثناء جلب بيانات الملف الشخصي" });
         }
         res.status(200).json(result)
+        
     })
 
 })
 
 // get student grades
 router.get("/grades/:id", (req, res) => {
-    console.log("Request params:", req.params); // تحقق مما يتم إرساله
     const studentId = req.params.id;
-    console.log("Extracted Student ID:", studentId);  
 
     if (!studentId) {
-        return res.status(400).json({ message: "Invalid student ID" });
+        return res.status(400).json({ message: "غير موجود ID" });
     }
 
     const query = `
@@ -44,7 +43,7 @@ router.get("/grades/:id", (req, res) => {
 
     connection.query(query, [studentId], (err, result) => {
         if (err) {
-            return res.status(400).json({ message: "Error retrieving grades" });
+            return res.status(400).json({ message: "حدث خطأ أثناء جلب العلامات" });
         }
         res.status(200).json(result);
     });
@@ -54,21 +53,23 @@ router.get("/grades/:id", (req, res) => {
 // get Student courses
 router.get("/courses-student/:id", (req, res) => {
     const studentId = req.params.id;
-    console.log(studentId)
+    if (!studentId) {
+        return res.status(400).json({ message: "غير موجود  ID" });
+    }
     const query = `
-        SELECT c.id, c.name, c.department, c.credits
-        FROM student_courses sc
-        JOIN courses c ON sc.course_id = c.id
-        WHERE sc.student_id = ?
+       SELECT course.id, course.name, course.department, course.credits
+        FROM student_courses 
+        JOIN courses course ON student_courses.course_id = course.id 
+        WHERE student_courses.student_id = ?
+
     `;
-    console.log(studentId)
-    connection.query(query, [studentId], (err, result) => {
+     connection.query(query, [studentId], (err, result) => {
         if (err) {
-            return res.status(400).json({ message: "Error fetching student courses", error: err });
+            return res.status(400).json({ message: "حدث خطأ أثناء جلب المواد المسجلة" });
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ message: "No courses found for this student" });
+            return res.status(404).json({ message: "لا توجد مواد مسجلة لهذا الطالب" });
         }
 
         res.status(200).json(result);

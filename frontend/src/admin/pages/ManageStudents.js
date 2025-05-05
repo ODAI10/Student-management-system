@@ -67,6 +67,9 @@ function ManageStudents() {
   };
 
   const handleDelete = () => {
+    const confirmDelete = window.confirm("هل أنت متأكد أنك تريد حذف هذا الطالب؟");
+    if (!confirmDelete) return;
+  
     axios
       .delete(`http://localhost:5000/api/admin/student/${selectedStudent.id}`, {
         headers: {
@@ -83,6 +86,7 @@ function ManageStudents() {
       })
       .catch((error) => console.error("Error deleting student", error));
   };
+  
 
   const handleSaveChanges = () => {
     axios
@@ -92,6 +96,10 @@ function ManageStudents() {
         phone: selectedStudent.phone,
         address: selectedStudent.address,
         status: selectedStudent.status === "نشط" ? "active" : "suspended",
+        
+      },{
+        withCredentials: true
+
       })
       .then((res) => {
         setUpdateMessage(res.data.message || "تم التحديث بنجاح");
@@ -108,33 +116,40 @@ function ManageStudents() {
 
   const handleAddStudent = () => {
     axios
-      .post("http://localhost:5000/api/admin/add-student", {
+    .post(
+      "http://localhost:5000/api/admin/add-student",
+      {
         full_name: newStudent.full_name,
         email: newStudent.email,
         phone: newStudent.phone,
         address: newStudent.address,
         status: newStudent.status === "نشط" ? "active" : "suspended",
         password: newStudent.password,
-      })
-      .then((res) => {
-        setAddMessage(res.data.message || "تمت الإضافة بنجاح");
-        setAddMessageType("success");
-        fetchStudents();
-        setNewStudent({
-          full_name: "",
-          email: "",
-          phone: "",
-          address: "",
-          status: "نشط",
-          password: "",
-        });
-      })
-      .catch((error) => {
-        const msg =
-          error.response?.data?.message || "حدث خطأ أثناء الإضافة";
-        setAddMessage(msg);
-        setAddMessageType("error");
+      },
+      {
+        withCredentials: true, // ✅ هذا هو المفتاح المهم
+      }
+    )
+    .then((res) => {
+      setAddMessage(res.data.message || "تمت الإضافة بنجاح");
+      setAddMessageType("success");
+      fetchStudents();
+      setNewStudent({
+        full_name: "",
+        email: "",
+        phone: "",
+        address: "",
+        status: "نشط",
+        password: "",
       });
+    })
+    .catch((error) => {
+      const msg =
+        error.response?.data?.message || "حدث خطأ أثناء الإضافة";
+      setAddMessage(msg);
+      setAddMessageType("error");
+    });
+  
   };
 
   const filteredStudents = students.filter((student) =>

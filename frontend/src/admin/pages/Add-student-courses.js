@@ -55,6 +55,7 @@ function AddStudentCourses() {
       .then((response) => {
         setStudentCourses(response.data);
         setLoading(false);
+        
       })
       .catch((error) => {
         console.error("Error fetching student courses:", error);

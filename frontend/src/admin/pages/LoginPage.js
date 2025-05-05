@@ -26,8 +26,7 @@ function LoginPage() {
         Cookies.set('jwt_token', token, { expires: 7, path: '/' }); // expires: 7 يعني الكوكي سيظل لمدة 7 أيام
         Cookies.set('student_id', student_id, { expires: 7, path: '/' });
         Cookies.set('role', role, { expires: 7, path: '/' });
-        console.log("Token:", token); // طباعة الـ token للتحقق
-        console.log("Role:", role);   // طباعة الـ role للتحقق
+        
 
         // التوجيه إلى لوحة التحكم بعد تسجيل الدخول بنجاح
         if (role === "admin") {
@@ -37,7 +36,7 @@ function LoginPage() {
         }
       })
       .catch((error) => {
-        setError('فشل في تسجيل الدخول، تأكد من صحة البيانات.');
+        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
         console.log(error);
       });
   };

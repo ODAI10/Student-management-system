@@ -50,13 +50,17 @@ function ManageGrades() {
       setLoading(false);
     });
   };
-
   const handleAddOrUpdateGrade = () => {
-    if (  !midterm || !final) {
+    if (!midterm || !final) {
       alert('يرجى ملء جميع الحقول');
       return;
     }
-
+  
+    if (parseInt(midterm) > 50 || parseInt(final) > 50) {
+      alert('الرجاء إدخال درجة 50 أو أقل');
+      return;
+    }
+  
     const gradeData = {
       student_id: selectedStudentId,
       course_id: selectedCourseId,
@@ -65,30 +69,28 @@ function ManageGrades() {
       total: parseInt(midterm) + parseInt(final),
       status: parseInt(midterm) + parseInt(final) >= 50 ? 'Pass' : 'Fail',
     };
-
+  
     if (selectedGradeId) {
-      // التعديل على الدرجة الحالية
       axios.put(`http://localhost:5000/api/admin/grade/${selectedGradeId}`, gradeData, {
         headers: { Authorization: `Bearer ${Cookies.get('jwt_token')}` },
       })
       .then(() => {
-        fetchGrades(); // تحديث الجدول بعد التعديل
+        fetchGrades();
         resetForm();
       })
       .catch((error) => console.error('Error updating grade', error));
     } else {
-      // إضافة درجة جديدة
       axios.post('http://localhost:5000/api/admin/grade', gradeData, {
         headers: { Authorization: `Bearer ${Cookies.get('jwt_token')}` },
       })
       .then(() => {
-        fetchGrades(); // تحديث الجدول بعد الإضافة
+        fetchGrades();
         resetForm();
       })
       .catch((error) => console.error('Error adding grade', error));
     }
   };
-
+  
   const resetForm = () => {
     setMidterm('');
     setFinal('');

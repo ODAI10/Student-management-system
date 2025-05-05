@@ -225,7 +225,7 @@ function ManageCourses() {
                             </Col>
                             <Col md={4} className="d-flex gap-2">
                               <Button
-                                className='btn btn-secondary'
+                                className='btn btn-info '
                                 onClick={() => handleEditClick(course)}
                               >
                                 ✏️ تعديل
